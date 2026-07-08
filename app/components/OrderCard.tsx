@@ -70,7 +70,8 @@ export default function OrderCard({
         color: "#c40000",
         marginTop: 0,
         marginBottom: 18,
-        fontSize: "clamp(22px,5vw,30px)",
+        fontSize: "clamp(24px,5vw,32px)",
+        fontWeight: "800",
       }}
     >
       Order #{order.id}
@@ -80,7 +81,7 @@ export default function OrderCard({
     <div
       style={{
         marginBottom: 20,
-        lineHeight: 1.7,
+        lineHeight: 1.9,
         fontSize: "clamp(14px,3vw,16px)",
         color: "#222"
       }}
@@ -114,12 +115,14 @@ export default function OrderCard({
 
     {/* Ordered Items */}
     <h3
-      style={{
-        marginTop: 0,
-        marginBottom: 12,
-        color: "#222",
-      }}
-    >
+  style={{
+    marginTop: 0,
+    marginBottom: 14,
+    color: "#b91c1c",
+    fontSize: "22px",
+    fontWeight: "800",
+  }}
+>
       🍽 Ordered Items
     </h3>
 
@@ -135,13 +138,25 @@ export default function OrderCard({
           color: "#222",
         }}
       >
-        <span>
-          {item.name} × {item.quantity}
-        </span>
+        <span
+  style={{
+    fontSize: "clamp(17px,4vw,20px)",
+    fontWeight: "700",
+    color: "#111",
+  }}
+>
+  {item.name} × {item.quantity}
+</span>
 
-        <strong>
-          ₹{item.price * item.quantity}
-        </strong>
+        <strong
+  style={{
+    fontSize: "18px",
+    color: "#b91c1c",
+  }}
+>
+  ₹{item.price * item.quantity}
+</strong>
+
       </div>
     ))}
 
@@ -167,27 +182,31 @@ export default function OrderCard({
         Total : ₹{order.total}
       </h2>
 
-      <div
-        style={{
-          color: statusColor(order.status),
-          fontWeight: "bold",
-          fontSize: "clamp(16px,4vw,18px)",
-        }}
-      >
-        Status :{" "}
-        {order.status === "Pending"
-          ? "Order Received"
-          : order.status}
-      </div>
-    </div>
-
+      <div style={{ marginTop: 12 }}>
+  <span
+    style={{
+      background: statusColor(order.status),
+      color: "#fff",
+      padding: "6px 14px",
+      borderRadius: 999,
+      fontWeight: "700",
+      fontSize: 14,
+      display: "inline-block",
+    }}
+  >
+    {order.status === "Pending"
+      ? "Order Received"
+      : order.status}
+  </span>
+</div>
+</div>
     {/* Buttons */}
     <div
       style={{
         display: "grid",
         gridTemplateColumns:
           "repeat(auto-fit,minmax(140px,1fr))",
-        gap: 12,
+        gap: 8,
         marginTop: 22,
       }}
     >
@@ -230,14 +249,15 @@ export default function OrderCard({
 
             border: `2px solid ${btn.color}`,
 
-            borderRadius: 14,
+            borderRadius: 10,
 
-            padding: "14px 10px",
-            minHeight: 52,
+            padding: "8px 6px",
+            minHeight: 38,
 
-            fontWeight: "bold",
+            fontWeight: "600",
 
-            fontSize: 15,
+            fontSize: 12,
+      
 
             cursor:
               (order.status === "Pending" &&

@@ -35,20 +35,37 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
 
 useEffect(() => {
+  console.log(
+  "Current Device Token:",
+  getDeviceToken()
+);
+
+console.log(
+  "Stored Phone:",
+  localStorage.getItem("customerPhone")
+);
   const q = query(
   collection(db, "orders"),
   where(
-    "deviceToken",
+    "customerId",
     "==",
-    getDeviceToken()
-  )
+    localStorage.getItem("customerPhone")
+)
 );
   const phone = localStorage.getItem("customerPhone");
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const firebaseOrders = snapshot.docs.map((doc) => ({
-      firestoreId: doc.id,
-      ...doc.data(),
-    })) as unknown as Order[];
+
+  console.log("Snapshot size:", snapshot.size);
+
+  snapshot.forEach((doc) => {
+    console.log("Document ID:", doc.id);
+    console.log("Document Data:", doc.data());
+  });
+
+  const firebaseOrders = snapshot.docs.map((doc) => ({
+    firestoreId: doc.id,
+    ...doc.data(),
+  })) as unknown as Order[];
 
     firebaseOrders.sort(
       (a, b) => Number(b.id) - Number(a.id)
@@ -86,27 +103,57 @@ useEffect(() => {
     opacity: 1,
   }}
 >
-      <h1
-        style={{
-          color: "#b91c1c",
-          marginBottom: 25,
-        }}
-      >
-        📦 My Orders
-      </h1>
+     <h1
+  style={{
+    color: "#b91c1c",
+    marginBottom: 28,
+    fontSize: "clamp(28px,6vw,36px)",
+    fontWeight: "bold",
+    textAlign: "center",
+  }}
+>
+  📦 My Orders
+</h1>
+        {orders.length === 0 ? (
+  <div
+    style={{
+      background: "white",
+      padding: 40,
+      borderRadius: 18,
+      textAlign: "center",
+      boxShadow: "0 8px 18px rgba(0,0,0,.08)",
+    }}
+  >
+    <div
+      style={{
+        fontSize: 55,
+        marginBottom: 12,
+      }}
+    >
+      📦
+    </div>
 
-      {orders.length === 0 ? (
-        <div
-          style={{
-            background: "white",
-            padding: 30,
-            borderRadius: 16,
-            textAlign: "center",
-          }}
-        >
-          No previous orders.
-        </div>
-      ) : (
+    <h2
+      style={{
+        margin: 0,
+        color: "#222",
+      }}
+    >
+      No Orders Yet
+    </h2>
+
+    <p
+      style={{
+        color: "#666",
+        marginTop: 10,
+        fontSize: 16,
+      }}
+    >
+      Your placed orders will appear here.
+    </p>
+  </div>
+) : (
+
         orders.map((order) => (
           <div
             key={order.firestoreId}
@@ -120,35 +167,115 @@ useEffect(() => {
   color: "#111",
 }}
           >
-            <h3>Order #{order.id}</h3>
+            <h2
+  style={{
+    margin: 0,
+    color: "#b91c1c",
+    fontSize: 26,
+    fontWeight: "bold",
+    marginBottom: 16,
+  }}
+>
+  Order #{order.id}
+</h2>
 
-            <p>📅 {order.orderDate}</p>
+<div
+  style={{
+    color: "#444",
+    lineHeight: 1.8,
+    fontSize: 16,
+  }}
+>
+  <div>📅 <strong>{order.orderDate}</strong></div>
+  <div>🕒 <strong>{order.orderTime}</strong></div>
 
-            <p>🕒 {order.orderTime}</p>
+  <div style={{ marginTop: 6 }}>
+    📦 Status:
+    <span
+      style={{
+        color: statusColor(order.status),
+        fontWeight: "bold",
+        marginLeft: 8,
+      }}
+    >
+      {order.status}
+    </span>
+  </div>
+</div>
 
-            <p>
-              <b>Status:</b>{" "}
-              <span
-                style={{
-                  color: statusColor(order.status),
-                  fontWeight: "bold",
-                }}
-              >
-                {order.status}
-              </span>
-            </p>
+<hr
+  style={{
+    margin: "18px 0",
+    border: "none",
+    borderTop: "1px solid #eee",
+  }}
+/>
 
-            <hr />
+<h3
+  style={{
+    marginBottom: 12,
+    color: "#333",
+    fontSize: 20,
+  }}
+>
+  🍽 Ordered Items
+</h3>
 
-            {order.cart.map((item, index) => (
-              <div key={index}>
-                {item.name} × {item.quantity}
-              </div>
-            ))}
+{order.cart.map((item, index) => (
+  <div
+    key={index}
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: 10,
+      fontSize: 17,
+    }}
+  >
+    <span>
+      {item.name} × {item.quantity}
+    </span>
 
-            <hr />
+    <strong>
+      ₹{item.price * item.quantity}
+    </strong>
+  </div>
+))}
 
-            <h3>Total ₹{order.total}</h3>
+<hr
+  style={{
+    margin: "18px 0",
+    border: "none",
+    borderTop: "1px solid #eee",
+  }}
+/>
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }}
+>
+  <span
+    style={{
+      fontSize: 22,
+      fontWeight: "bold",
+    }}
+  >
+    Total
+  </span>
+
+  <span
+    style={{
+      fontSize: 28,
+      color: "#b91c1c",
+      fontWeight: "bold",
+    }}
+  >
+    ₹{order.total}
+  </span>
+</div>
+
           </div>
         ))
       )}

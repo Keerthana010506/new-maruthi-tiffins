@@ -1,4 +1,4 @@
-console.log("USING FIRESTORE FILE");
+
 import {
   collection,
   addDoc,
@@ -10,9 +10,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebase";
-console.log("FIRESTORE FILE LOADED");
 export async function createOrder(order: Record<string, unknown>) {
-  console.log("Writing order to Firestore...");
 
   const docRef = await addDoc(
     collection(db, "orders"),
@@ -74,9 +72,6 @@ export async function toggleAvailability(
   firestoreId: string,
   available: boolean
 ) {
-  console.log("Updating:", firestoreId);
-  console.log("Writing available =", available);
-
   await updateDoc(
     doc(db, "menu", firestoreId),
     {
@@ -84,6 +79,5 @@ export async function toggleAvailability(
     }
   );
 
-  console.log("Updated successfully");
+
 }
-export const test123 = "hello";

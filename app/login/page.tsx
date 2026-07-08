@@ -46,10 +46,11 @@ export default function LoginPage() {
     setConfirmation(result);
 
     alert("OTP Sent ✅");
-  } catch (err) {
-    console.error(err);
-    alert("Failed to send OTP");
-  }
+  } catch (err: any) {
+  console.error(err);
+
+  alert(`${err.code}\n${err.message}`);
+}
 }
 async function verifyOTP() {
   try {
@@ -82,10 +83,14 @@ if (!customerSnap.exists()) {
 router.push("/");
     
   } 
- catch (err: unknown) {
+  catch (err) {
   console.error(err);
 
-  alert(`${err.code}\n${err.message}`);
+  if (err instanceof Error) {
+    alert(err.message);
+  } else {
+    alert("Verification failed.");
+  }
 }
 }
 

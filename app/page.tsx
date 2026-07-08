@@ -7,7 +7,6 @@ import Image from "next/image";
 import BottomNav from "./components/BottomNav";
 import {
   collection,
-  getDocs,
   onSnapshot,
   query,
 } from "firebase/firestore";
@@ -20,7 +19,7 @@ type CartItem = {
 };
 
 export default function Home() {
-  console.log("HOME PAGE VERSION 123456");
+ 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
@@ -30,6 +29,8 @@ export default function Home() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [menu, setMenu] = useState<any[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const cartSectionRef = useRef<HTMLDivElement | null>(null);
+  const [showFloatingCart, setShowFloatingCart] = useState(true);
 
   useEffect(() => {
   function loadProfile() {
@@ -52,33 +53,35 @@ export default function Home() {
 }, []);
 
 useEffect(() => {
-  alert("NEW VERSION LOADED");
-  async function loadMenu() {
-    alert("LOAD MENU CALLED");
-    try {
-     alert("About to fetch Firestore");
+  const q = query(collection(db, "menu"));
 
-const snapshot = await getDocs(collection(db, "menu"));
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const data = snapshot.docs.map((doc) => ({
+      firestoreId: doc.id,
+      ...doc.data(),
+    }));
 
-alert("Firestore returned " + snapshot.size + " docs");
+    setMenu(data);
+  });
 
-      console.log("Docs:", snapshot.size);
+  return () => unsubscribe();
+}, []);
 
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+useEffect(() => {
+  function handleScroll() {
+    if (!cartSectionRef.current) return;
 
-      console.log(data);
+    const rect = cartSectionRef.current.getBoundingClientRect();
 
-      setMenu(data);
-    } catch (e) {
-      console.error(e);
-      alert(String(e));
-    }
+    // Hide cart when checkout section comes into view
+    setShowFloatingCart(rect.top > window.innerHeight - 200);
   }
 
-  loadMenu();
+  window.addEventListener("scroll", handleScroll);
+
+  handleScroll();
+
+  return () => window.removeEventListener("scroll", handleScroll);
 }, []);
 
   function addToCart(name: string, price: number) {
@@ -167,6 +170,7 @@ alert("Firestore returned " + snapshot.size + " docs");
 
     const order = {
   id: Date.now(),
+  createdAt: Date.now(),
   deviceToken: getDeviceToken(),
   customerName,
   phone,
@@ -187,11 +191,9 @@ alert("Firestore returned " + snapshot.size + " docs");
 
   orderDate: new Date().toLocaleDateString(),
 };
-console.log("ORDER OBJECT:", order);
-console.count("createOrder called");
-const firestoreId = await createOrder(order);
+await createOrder(order);
 
-console.log("Returned Firestore ID:", firestoreId);
+
 localStorage.setItem("customerPhone", phone);
     setShowSuccess(true);
 
@@ -221,15 +223,13 @@ setTimeout(() => {
   }
 
   return (
-    <main
+ <main
   style={{
     background: "#ece6dc",
     minHeight: "100vh",
     width: "100%",
-    maxWidth: "1200px",
-    margin: "0 auto",
-    padding: "16px",
-    paddingBottom: "90px",
+    padding: "10px",
+    paddingBottom: "120px",
     boxSizing: "border-box",
     color: "#111",
   }}
@@ -240,16 +240,21 @@ setTimeout(() => {
   flexWrap: "wrap",
   justifyContent: "center",
   alignItems: "center",
-  gap: 18,
+  gap: 10,
   marginBottom: 25,
   textAlign: "center",
 }}
 >
+
   <Image
   src="/images/logo.png"
   alt="New Maruthi Tiffins"
-  width={75}
-  height={75}
+  width={45}
+  height={45}
+  style={{
+    width: "45px",
+    height: "45px",
+  }}
 />
 
   <div>
@@ -257,7 +262,7 @@ setTimeout(() => {
       style={{
         margin: 0,
         color: "#b91c1c",
-        fontSize: "clamp(28px,6vw,40px)",
+        fontSize: 28,
       }}
     >
       New Maruthi Tiffins
@@ -267,7 +272,7 @@ setTimeout(() => {
       style={{
         margin: 0,
         color: "#555",
-        fontSize: "clamp(14px,3vw,18px)",
+        fontSize: 12,
       }}
     >
       Fresh • Affordable • Same Day Delivery
@@ -330,89 +335,7 @@ setTimeout(() => {
           </div>
         </div>
       )}
-        <div
-  style={{
-    background: "white",
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 30,
-    boxShadow:
-      "0 4px 14px rgba(0,0,0,.08)",
-  }}
->
-  <h2
-    style={{
-      fontSize: "clamp(22px,5vw,28px)",
-      color: "#c40000",
-      marginBottom: 15,
-    }}
-  >
-    🚚 Delivery Information
-  </h2>
-
-  <p
-    style={{
-      color: "#333",
-      marginBottom: 8,
-    }}
-  >
-    🕕 Morning: 6:00 AM – 2:00 PM
-  </p>
-
- <p
-style={{
-color:"#333",
-marginBottom:8,
-}}
->
-📍 Delivery available within 8 km
-</p>
-
-<p
-style={{
-color:"#333",
-marginBottom:8,
-}}
->
-🚚 0–3 km → ₹30
-</p>
-
-<p
-style={{
-color:"#333",
-marginBottom:8,
-}}
->
-🚚 3–6 km → ₹40
-</p>
-
-<p
-style={{
-color:"#333",
-marginBottom:8,
-}}
->
-🚚 6–8 km → ₹60
-</p>
-
-<p
-style={{
-color:"#16a34a",
-fontWeight:"bold",
-marginBottom:8,
-}}
->
-🎉 Orders above ₹300 → FREE Delivery
-</p>
-
-<p
-style={{
-color:"#666",
-}}
->
-Delivery fee calculated after address confirmation.
-</p>
-</div>
+       
       <h2
         style={{
           marginBottom: 20,
@@ -423,43 +346,31 @@ Delivery fee calculated after address confirmation.
         {"Today's Menu"}
       </h2>
 
-      <div
+<div
   style={{
     display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(260px, 1fr))",
-    gap: 20,
-    alignItems: "stretch",
+    gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+    gap: 12,
+    width: "100%",
   }}
 >
-  <p style={{color:"red",fontSize:24}}>
-Menu length: {menu.length}
-</p>
-<pre
-  style={{
-    color: "blue",
-    whiteSpace: "pre-wrap",
-    fontSize: 12,
-  }}
->
-{JSON.stringify(menu, null, 2)}
-</pre>
-        {menu.map((item) => (
+
+        {menu
+  .filter((item) => item.inStock && item.available)
+  .map((item) => (
          <div
   key={item.name}
   style={{
-    background: "white",
-    padding: "clamp(12px,3vw,24px)",
-    display:"flex",
-    flexDirection:"column",
-    justifyContent:"space-between",
-    borderRadius: 18,
-    boxShadow: "0 4px 12px rgba(0,0,0,.08)",
-  }}
+  background: "white",
+  borderRadius: 16,
+  overflow: "hidden",
+  boxShadow: "0 2px 8px rgba(0,0,0,.08)",
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+}}
 >
-  <div style={{color:"red"}}>
-{item.name}
-</div>
+
   <Image
   src={item.image}
   alt={item.name}
@@ -467,20 +378,20 @@ Menu length: {menu.length}
   height={220}
   style={{
   width: "100%",
-  height: 190,
+  height: 105,
   objectFit: "cover",
-  borderRadius: 14,
+  borderRadius: 0,
   display: "block",
-  marginBottom: 14,
+  marginBottom: 8,
 }}
 />
 
   <h3
   style={{
-    margin: "8px 0",
-    fontSize: "clamp(18px,4vw,22px)",
+    margin: "4px 0",
+    fontSize: 15,
+    fontWeight:600,
     color: "#222",
-    minHeight: 54,
   }}
 >
   {item.name}
@@ -488,10 +399,10 @@ Menu length: {menu.length}
 
   <p
   style={{
-    fontSize: 22,
+    fontSize: 17,
     fontWeight: "bold",
     color: "#c40000",
-    margin: "8px 0 16px",
+    margin: "2px 0 10px",
   }}
 >
   ₹{item.price}
@@ -502,127 +413,137 @@ Menu length: {menu.length}
     (c) => c.name === item.name
   );
 
+  // Item unavailable
+  if (!item.available) {
+    return (
+      <button
+        disabled
+        style={{
+          width: "100%",
+          padding: 10,
+          background: "#999",
+          color: "white",
+          border: "none",
+          borderRadius: 12,
+        }}
+      >
+        Out of Stock
+      </button>
+    );
+  }
+
+  // Item available but NOT in cart
   if (!cartItem) {
     return (
       <button
-        onClick={() =>
-          addToCart(item.name, item.price)
-        }
-       style={{
-  width: "100%",
-  padding: "14px",
-  fontSize: 16,
-  background: "#c40000",
-  color: "#fff",
-  border: "none",
-  borderRadius: 12,
-  cursor: "pointer",
-  fontWeight: "bold",
-  transition: "0.2s",
-}}
+        onClick={() => addToCart(item.name, item.price)}
+        style={{
+          width: "100%",
+          padding: "8px",
+          fontSize: 14,
+          background: "#c40000",
+          color: "#fff",
+          border: "none",
+          borderRadius: 12,
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
       >
         + Add
       </button>
     );
   }
 
+  // Item available AND already in cart
   return (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: 16,
-      marginTop: 12,
-      background: "#f8fafc",
-      padding: "10px",
-      borderRadius: 14,
-    }}
-  >
-    <button
-      onClick={() => decrease(item.name)}
+    <div
       style={{
-        width: 46,
-        height: 46,
-        fontWeight: "bold",
-        borderRadius: 12,
-        border: "none",
-        background: "#c40000",
-        color: "white",
-        fontSize: 22,
-        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 16,
+        marginTop: 12,
+        background: "#f8fafc",
+        padding: "10px",
+        borderRadius: 14,
       }}
     >
-      −
-    </button>
+      <button
+        onClick={() => decrease(item.name)}
+        style={{
+          width: 38,
+          height: 38,
+          fontWeight: "bold",
+          borderRadius: 12,
+          border: "none",
+          background: "#c40000",
+          color: "white",
+          fontSize: 18,
+          cursor: "pointer",
+        }}
+      >
+        −
+      </button>
 
-    <span
-      style={{
-        fontWeight: "bold",
-        fontSize: 22,
-        minWidth: 40,
-        textAlign: "center",
-        color: "#222",
-      }}
-    >
-      {cartItem.quantity}
-    </span>
+      <span
+        style={{
+          fontWeight: "bold",
+          fontSize: 18,
+          minWidth: 40,
+          textAlign: "center",
+          color: "#222",
+        }}
+      >
+        {cartItem.quantity}
+      </span>
 
-    <button
-      onClick={() =>
-        addToCart(item.name, item.price)
-      }
-      style={{
-        width: 46,
-        height: 46,
-        fontWeight: "bold",
-        borderRadius: 12,
-        border: "none",
-        background: "#16a34a",
-        color: "white",
-        fontSize: 22,
-        cursor: "pointer",
-      }}
-    >
-      +
-    </button>
-  </div>
-);
+      <button
+        onClick={() => addToCart(item.name, item.price)}
+        style={{
+          width: 38,
+          height: 38,
+          fontWeight: "bold",
+          borderRadius: 12,
+          border: "none",
+          background: "#16a34a",
+          color: "white",
+          fontSize: 18,
+          cursor: "pointer",
+        }}
+      >
+        +
+      </button>
+    </div>
+  );
 })()}
 </div>
         ))}
-        <pre
-  style={{
-    color: "blue",
-    fontSize: 10,
-    whiteSpace: "pre-wrap",
-  }}
->
-{JSON.stringify(menu.slice(0,2), null, 2)}
-</pre>
+        
       </div>
 
-      <div
-        style={{
-          background: "white",
-          marginTop: 40,
-          padding: 20,
-          boxShadow:"0 8px 20px rgba(0,0,0,.08)",
-          border: "1px solid #f1f5f9",
-          borderRadius: 20,
-        }}
-      >
-        <h2
+     <div
+    ref={cartSectionRef}
   style={{
-    fontSize: "clamp(24px,5vw,32px)",
-    color: "#222",
-    marginTop: 40,
-    marginBottom: 20,
+    background: "#fff",
+    marginTop: 32,
+    padding: 18,
+    boxShadow: "0 6px 16px rgba(0,0,0,.06)",
+    borderRadius: 18,
+    border: "1px solid #ececec",
+  }}
+>
+       <h2
+  style={{
+    fontSize: "clamp(22px,5vw,28px)",
+    fontWeight: 700,
+    color: "#b91c1c",
+    marginTop: 20,
+    marginBottom: 24,
+    textAlign: "center",
   }}
 >
   🛒 Your Cart
 </h2>
-
        {cart.map((item) => (
   <div
     key={item.name}
@@ -632,10 +553,10 @@ Menu length: {menu.length}
       padding: 16,
       marginBottom: 14,
       display: "flex",
-      justifyContent: "space-between",
+      justifyContent: "flex-start",
       alignItems: "center",
       flexWrap: "wrap",
-      gap: 12,
+      gap: 8,
     }}
   >
     <div>
@@ -716,14 +637,21 @@ Menu length: {menu.length}
 ))}
         <h3
   style={{
-    marginTop: 25,
+    marginTop: 20,
     color: "#c40000",
   }}
 >
   🚚 Select Delivery Distance
 </h3>
 
-<label style={{ display: "block", marginBottom: 10 }}>
+<label
+  style={{
+    display: "block",
+    marginBottom: 8,
+    fontSize: 16,
+  }}
+>
+
   <input
     type="radio"
     value="0-3"
@@ -735,7 +663,16 @@ Menu length: {menu.length}
   {" "}0–3 km (₹30)
 </label>
 
-<label style={{ display: "block", marginBottom: 10 }}>
+
+<label
+  style={{
+    display: "block",
+    marginBottom: 8,
+    fontSize: 16,
+    color: "#333",
+  }}
+>
+
   <input
     type="radio"
     value="3-6"
@@ -747,7 +684,14 @@ Menu length: {menu.length}
   {" "}3–6 km (₹40)
 </label>
 
-<label style={{ display: "block", marginBottom: 20 }}>
+<label
+  style={{
+    display: "block",
+    marginBottom: 8,
+    fontSize: 16,
+    color: "#333",
+  }}
+>
   <input
     type="radio"
     value="6-8"
@@ -761,10 +705,10 @@ Menu length: {menu.length}
         <input
         style={{
   width: "100%",
-  padding: "14px",
+  padding: "12px",
   borderRadius: 10,
   border: "1px solid #ddd",
-  fontSize: 16,
+  fontSize: 15,
   marginBottom: 14,
   boxSizing: "border-box",
 }}
@@ -779,10 +723,10 @@ Menu length: {menu.length}
         <input
         style={{
   width: "100%",
-  padding: "14px",
+  padding: "12px",
   borderRadius: 10,
   border: "1px solid #ddd",
-  fontSize: 16,
+  fontSize: 15,
   marginBottom: 14,
   boxSizing: "border-box",
 }}
@@ -797,7 +741,7 @@ Menu length: {menu.length}
         <textarea
         style={{
   width: "100%",
-  padding: "14px",
+  padding: "12px",
   borderRadius: 10,
   border: "1px solid #ddd",
   fontSize: 16,
@@ -813,39 +757,153 @@ Menu length: {menu.length}
           placeholder="Address"
         />
 
-        <h3>Subtotal: ₹{subtotal}</h3>
+      <div
+  style={{
+    marginTop: 20,
+    marginBottom: 20,
+    background: "#fafafa",
+    borderRadius: 14,
+    padding: 18,
+    border: "1px solid #e5e5e5",
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: 12,
+      fontSize: 16,
+      color: "#444",
+    }}
+  >
+    <span>Subtotal</span>
+    <strong>₹{subtotal}</strong>
+  </div>
 
-        <h3>
-          Delivery: ₹
-          {deliveryFee}
-        </h3>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: 12,
+      fontSize: 16,
+      color: "#444",
+    }}
+  >
+    <span>Delivery</span>
+    <strong>₹{deliveryFee}</strong>
+  </div>
 
-        <h2
-          style={{
-            color: "#c40000",
-          }}
-        >
-          Total: ₹{total}
-        </h2>
+  <hr
+    style={{
+      border: "none",
+      borderTop: "1px dashed #ddd",
+      margin: "14px 0",
+    }}
+  />
+
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      fontSize: 20,
+      fontWeight: "bold",
+      color: "#c40000",
+    }}
+  >
+    <span>Total</span>
+    <span>₹{total}</span>
+  </div>
+</div>
 
         <button
           onClick={placeOrder}
           style={{
-            background: "#c40000",
-            color: "white",
-            width:"100%",
-padding:"16px",
-fontSize:18,
-fontWeight:"bold",
-cursor:"pointer",
-            border: 0,
-            borderRadius: 10,
-          }}
+  background: "#c40000",
+  color: "white",
+  width: "100%",
+  padding: "14px",
+  marginTop: 18,
+  fontSize: 16,
+  fontWeight: "bold",
+  cursor: "pointer",
+  border: "none",
+  borderRadius: 14,
+  boxShadow: "0 6px 15px rgba(196,0,0,.25)",
+  transition: "0.2s",
+}}
         >
           Place Order
         </button>
       </div>
+      {cart.length > 0 && showFloatingCart && (
+  <div
+    onClick={() =>
+      cartSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+      })
+    }
+    style={{
+      position: "fixed",
+
+      left: 16,
+      right: 16,
+
+      bottom: 100,
+
+      background: "#c40000",
+
+      color: "#fff",
+
+      borderRadius: 999,
+
+      padding: "14px 18px",
+
+      display: "flex",
+
+      justifyContent: "space-between",
+
+      alignItems: "center",
+
+      boxShadow: "0 10px 30px rgba(196,0,0,.35)",
+
+      cursor: "pointer",
+
+      zIndex: 999,
+    }}
+  >
+    <div>
+      <div
+        style={{
+          fontWeight: 700,
+          fontSize: 16,
+        }}
+      >
+        🛒 {cart.reduce((a, b) => a + b.quantity, 0)} Items
+      </div>
+
+      <div
+        style={{
+          fontSize: 13,
+          opacity: 0.9,
+        }}
+      >
+        Tap to view cart
+      </div>
+    </div>
+
+    <div
+      style={{
+        fontSize: 22,
+        fontWeight: "bold",
+      }}
+    >
+      ₹{total} →
+    </div>
+  </div>
+)}
       <BottomNav />
+      
       <audio
   ref={audioRef}
   src="/sounds/success.mp3"

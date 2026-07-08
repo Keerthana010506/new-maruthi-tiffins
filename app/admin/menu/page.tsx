@@ -107,11 +107,6 @@ export default function AdminMenuPage() {
       !item.available
     );
 
-    await Firestore.toggleAvailability(
-  item.firestoreId,
-  !item.available
-);
-
 // Reload menu from Firestore
 const items = await Firestore.getMenuItems();
 setMenu(items as MenuItem[]);

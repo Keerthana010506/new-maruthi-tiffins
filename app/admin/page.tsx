@@ -46,6 +46,7 @@ type MenuItem = {
   price: number;
   image: string;
   category: string;
+  available: boolean;
 };
 export default function AdminPage() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
@@ -64,6 +65,7 @@ export default function AdminPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [selectedStatus, setSelectedStatus] =
   useState("Pending");
+  const [searchText, setSearchText] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const pendingOrders = orders.filter(
   (order) => order.status === "Pending"
@@ -84,6 +86,55 @@ const totalRevenue = deliveredOrders.reduce(
   (sum, order) => sum + order.total,
   0
 );
+const today = new Date();
+
+const todayString = today.toLocaleDateString("en-GB");
+
+const yesterday = new Date();
+yesterday.setDate(today.getDate() - 1);
+
+const yesterdayString = yesterday.toLocaleDateString("en-GB");
+
+const todayRevenue = deliveredOrders
+  .filter((order) => order.orderDate === todayString)
+  .reduce((sum, order) => sum + order.total, 0);
+
+const yesterdayRevenue = deliveredOrders
+  .filter((order) => order.orderDate === yesterdayString)
+  .reduce((sum, order) => sum + order.total, 0);
+
+const weekStart = new Date();
+weekStart.setDate(today.getDate() - today.getDay());
+
+const weekRevenue = deliveredOrders
+  .filter((order) => {
+    if (!order.orderDate) return false;
+
+    const [day, month, year] = order.orderDate.split("/");
+
+    const orderDate = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day)
+    );
+
+    return orderDate >= weekStart;
+  })
+  .reduce((sum, order) => sum + order.total, 0);
+
+const monthRevenue = deliveredOrders
+  .filter((order) => {
+    if (!order.orderDate) return false;
+
+    const [day, month, year] = order.orderDate.split("/");
+
+    return (
+      Number(month) === today.getMonth() + 1 &&
+      Number(year) === today.getFullYear()
+    );
+  })
+  .reduce((sum, order) => sum + order.total, 0);
+  
 const displayedOrders =
   selectedStatus === "Pending"
     ? pendingOrders
@@ -93,7 +144,20 @@ const displayedOrders =
     ? preparedOrders
     : selectedStatus === "Delivered"
     ? deliveredOrders
+    : selectedStatus === "Revenue"
+    ? []
     : orders;
+
+  const filteredOrders = displayedOrders.filter((order) => {
+  const search = searchText.toLowerCase().trim();
+
+  return (
+    order.customerName.toLowerCase().includes(search) ||
+    order.phone.includes(search) ||
+    String(order.id).includes(search)
+  );
+});
+
 useEffect(() => {
   const loggedIn =
     localStorage.getItem("adminLoggedIn");
@@ -384,24 +448,146 @@ maxWidth: 120,
   </button>
 </div>
 
-    <div
+    {selectedStatus === "Revenue" ? (
+
+<div
   style={{
-    display: "flex",
-    flexDirection: "column",
-    gap: 20,
+    background: "#fff",
+    borderRadius: 18,
+    padding: 24,
+    boxShadow: "0 8px 20px rgba(0,0,0,.08)",
+    marginTop: 20,
   }}
 >
-     {displayedOrders.map((order, index) => (
-  <OrderCard
-    key={order.firestoreId}
-    order={order}
-    index={index}
-    updateStatus={updateStatus}
-    statusColor={statusColor}
-  />
-))}
+
+  <h2
+    style={{
+      color: "#7c3aed",
+      marginTop: 0,
+      marginBottom: 24,
+    }}
+  >
+    💰 Revenue Summary
+  </h2>
+
+  <div style={{fontSize:18,lineHeight:2}}>
+
+    <div>
+      Today's Revenue
+      <strong style={{float:"right"}}>
+        ₹{todayRevenue}
+      </strong>
+    </div>
+
+    <div>
+      Yesterday
+      <strong style={{float:"right"}}>
+        ₹{yesterdayRevenue}
+      </strong>
+    </div>
+
+    <div>
+      This Week
+      <strong style={{float:"right"}}>
+        ₹{weekRevenue}
+      </strong>
+    </div>
+
+    <div>
+      This Month
+      <strong style={{float:"right"}}>
+        ₹{monthRevenue}
+      </strong>
+    </div>
+
+    <hr style={{margin:"18px 0"}} />
+
+    <div
+      style={{
+        fontSize:24,
+        fontWeight:"bold",
+        color:"#7c3aed",
+      }}
+    >
+      Total Revenue
+      <span style={{float:"right"}}>
+        ₹{totalRevenue}
+      </span>
+    </div>
+
+  </div>
+
 </div>
-    <audio
+
+) : (
+
+<>
+  {selectedStatus === "Delivered" && (
+    <div
+  style={{
+    marginBottom: 24,
+    background: "#ece6db",
+    padding: "8px 0",
+  }}
+>
+      <input
+        type="text"
+        placeholder="🔍 Search by Order ID, Customer or Phone"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "12px 16px",
+          borderRadius: 12,
+          border: "1px solid #ddd",
+          fontSize: 16,
+          outline: "none",
+          boxSizing: "border-box",
+        }}
+      />
+    </div>
+  )}
+
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 20,
+    }}
+  >
+    {filteredOrders.length === 0 ? (
+  <div
+    style={{
+  width: "100%",
+  padding: "16px 18px",
+  borderRadius: 16,
+  border: "2px solid #d6d3d1",
+  background: "#ffffff",
+  fontSize: 16,
+  outline: "none",
+  boxSizing: "border-box",
+  boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+}}
+  >
+    No orders found.
+  </div>
+) : (
+  filteredOrders.map((order, index) => (
+    <OrderCard
+      key={order.firestoreId}
+      order={order}
+      index={index}
+      updateStatus={updateStatus}
+      statusColor={statusColor}
+    />
+  ))
+)}
+  </div>
+</>
+
+)}
+
+<audio
   ref={audioRef}
   src="/sounds/notification.mp3"
   loop

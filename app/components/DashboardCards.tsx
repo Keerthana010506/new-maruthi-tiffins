@@ -46,7 +46,7 @@ export default function DashboardCards({
       title: "💰 Revenue",
       value: `₹${revenue}`,
       color: "#7c3aed",
-      status: "All",
+      status: "Revenue",
     },
   ];
 
