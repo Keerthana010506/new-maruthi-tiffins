@@ -12,13 +12,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "New Maruthi Tiffins",
-  description:
-    "Fresh South Indian Breakfast Delivered to Your Door",
 
-  icons: {
-    icon: "/images/logo.png",
+
+export const metadata: Metadata = {
+  title: "New Maruthi Tiffins | Fresh Tiffins & Online Ordering",
+  description:
+    "Official website of New Maruthi Tiffins. Browse today's menu, place orders online and enjoy fresh homemade tiffins.",
+  keywords: [
+    "New Maruthi Tiffins",
+    "Maruthi Tiffins",
+    "Warangal Tiffins",
+    "Breakfast",
+    "Online Food Ordering",
+    "South Indian Tiffins"
+  ],
+  authors: [
+    {
+      name: "New Maruthi Tiffins",
+    },
+  ],
+  creator: "New Maruthi Tiffins",
+
+  openGraph: {
+    title: "New Maruthi Tiffins",
+    description:
+      "Official website of New Maruthi Tiffins.",
+    url: "https://new-maruthi-tiffins.vercel.app",
+    siteName: "New Maruthi Tiffins",
+    type: "website",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

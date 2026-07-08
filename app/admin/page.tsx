@@ -452,7 +452,7 @@ maxWidth: 120,
 
 <div
   style={{
-    background: "#333",
+    background: "#FFF8E7",
     borderRadius: 18,
     padding: 24,
     boxShadow: "0 8px 20px rgba(0,0,0,.08)",
@@ -462,7 +462,7 @@ maxWidth: 120,
 
   <h2
     style={{
-      color: "#7c3aed",
+      color: "#2d2d2d",
       marginTop: 0,
       marginBottom: 24,
     }}
@@ -470,43 +470,79 @@ maxWidth: 120,
     💰 Revenue Summary
   </h2>
 
-  <div style={{fontSize:18,lineHeight:2}}>
+  <div
+  style={{
+    fontSize: 18,
+    lineHeight: 2,
+    color: "#2d2d2d",
+  }}
+>
 
     <div>
       Today's Revenue
-      <strong style={{float:"right"}}>
+      <strong
+  style={{
+    float: "right",
+    color: "#111",
+    fontWeight: 700,
+  }}
+>
         ₹{todayRevenue}
       </strong>
     </div>
 
     <div>
       Yesterday
-      <strong style={{float:"right"}}>
+      <strong
+  style={{
+    float: "right",
+    color: "#111",
+    fontWeight: 700,
+  }}
+>
         ₹{yesterdayRevenue}
       </strong>
     </div>
 
     <div>
       This Week
-      <strong style={{float:"right"}}>
+      <strong
+  style={{
+    float: "right",
+    color: "#111",
+    fontWeight: 700,
+  }}
+>
         ₹{weekRevenue}
       </strong>
     </div>
 
     <div>
       This Month
-      <strong style={{float:"right"}}>
+      <strong
+  style={{
+    float: "right",
+    color: "#111",
+    fontWeight: 700,
+  }}
+>
         ₹{monthRevenue}
       </strong>
     </div>
 
-    <hr style={{margin:"18px 0"}} />
+    <hr
+  style={{
+    margin: "22px 0",
+    border: "none",
+    borderTop: "1px solid #ddd",
+  }}
+/>
 
     <div
       style={{
         fontSize:24,
         fontWeight:"bold",
-        color:"#7c3aed",
+        color: "#2d2d2d",
       }}
     >
       Total Revenue
