@@ -16,8 +16,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "New Maruthi Tiffins | Fresh Tiffins & Online Ordering",
+
   description:
     "Official website of New Maruthi Tiffins. Browse today's menu, place orders online and enjoy fresh homemade tiffins.",
+
   keywords: [
     "New Maruthi Tiffins",
     "Maruthi Tiffins",
@@ -26,12 +28,19 @@ export const metadata: Metadata = {
     "Online Food Ordering",
     "South Indian Tiffins"
   ],
+
   authors: [
     {
       name: "New Maruthi Tiffins",
     },
   ],
+
   creator: "New Maruthi Tiffins",
+
+  // 👇 ADD THIS
+  verification: {
+    google: "5SsVl3hAM_miPCKRdPjlzpbqDY0T1EueRF1ZuICMhyU",
+  },
 
   openGraph: {
     title: "New Maruthi Tiffins",
