@@ -35,6 +35,11 @@ export default function LoginPage() {
       );
     }
 
+    if (phone.length !== 10) {
+  alert("Please enter a valid 10-digit mobile number.");
+  return;
+}
+
     const fullPhone = "+91" + phone;
 
     const result = await signInWithPhoneNumber(

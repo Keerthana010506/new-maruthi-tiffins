@@ -157,6 +157,10 @@ useEffect(() => {
   const total = subtotal + deliveryFee;
   
   async function placeOrder() {
+    if (phone.length !== 10) {
+  alert("Please enter a valid 10-digit mobile number.");
+  return;
+}
     
     if (
       !customerName ||
@@ -721,23 +725,40 @@ setTimeout(() => {
           placeholder="Your Name"
         />
         <input
-        style={{
-  width: "100%",
-  padding: "12px",
-  borderRadius: 10,
-  border: "1px solid #ddd",
-  fontSize: 15,
-  marginBottom: 14,
-  boxSizing: "border-box",
-}}
-          value={phone}
-          onChange={(e) =>
-            setPhone(
-              e.target.value
-            )
-          }
-          placeholder="Phone"
-        />
+  style={{
+    width: "100%",
+    padding: "12px",
+    borderRadius: 10,
+    border:
+      phone.length > 0 && phone.length !== 10
+        ? "2px solid #dc2626"
+        : "1px solid #ddd",
+    fontSize: 15,
+    marginBottom: 4,
+    boxSizing: "border-box",
+  }}
+  value={phone}
+  onChange={(e) =>
+    setPhone(
+      e.target.value.replace(/\D/g, "").slice(0, 10)
+    )
+  }
+  placeholder="Phone"
+/>
+
+    {phone.length > 0 && phone.length !== 10 && (
+  <p
+    style={{
+      color: "#dc2626",
+      fontSize: 13,
+      marginTop: 0,
+      marginBottom: 14,
+    }}
+  >
+    Please enter a valid 10-digit mobile number.
+  </p>
+)}
+
         <textarea
         style={{
   width: "100%",
@@ -817,16 +838,45 @@ setTimeout(() => {
 </div>
 
         <button
+          disabled={
+  phone.length !== 10 ||
+  !customerName ||
+  !address ||
+  cart.length === 0
+}
           onClick={placeOrder}
           style={{
-  background: "#c40000",
+  background:
+    phone.length !== 10 ||
+    !customerName ||
+    !address ||
+    cart.length === 0
+      ? "#9ca3af"
+      : "#c40000",
+
   color: "white",
   width: "100%",
   padding: "14px",
   marginTop: 18,
   fontSize: 16,
   fontWeight: "bold",
-  cursor: "pointer",
+
+  cursor:
+    phone.length !== 10 ||
+    !customerName ||
+    !address ||
+    cart.length === 0
+      ? "not-allowed"
+      : "pointer",
+
+  opacity:
+    phone.length !== 10 ||
+    !customerName ||
+    !address ||
+    cart.length === 0
+      ? 0.7
+      : 1,
+
   border: "none",
   borderRadius: 14,
   boxShadow: "0 6px 15px rgba(196,0,0,.25)",

@@ -452,7 +452,7 @@ maxWidth: 120,
 
 <div
   style={{
-    background: "#fff",
+    background: "#333",
     borderRadius: 18,
     padding: 24,
     boxShadow: "0 8px 20px rgba(0,0,0,.08)",
