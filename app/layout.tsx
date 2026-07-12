@@ -45,13 +45,30 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "New Maruthi Tiffins",
-    description:
-      "Official website of New Maruthi Tiffins.",
-    url: "https://new-maruthi-tiffins.vercel.app",
-    siteName: "New Maruthi Tiffins",
-    type: "website",
-  },
+  title: "New Maruthi Tiffins | Fresh Tiffins & Online Ordering",
+  description:
+    "Official website of New Maruthi Tiffins. Browse today's menu and order fresh South Indian tiffins online.",
+  url: "https://new-maruthi-tiffins.vercel.app",
+  siteName: "New Maruthi Tiffins",
+  images: [
+    {
+      url: "/images/og-image.jpg",
+      width: 1200,
+      height: 630,
+      alt: "New Maruthi Tiffins",
+    },
+  ],
+  locale: "en_IN",
+  type: "website",
+},
+
+twitter: {
+  card: "summary_large_image",
+  title: "New Maruthi Tiffins | Fresh Tiffins & Online Ordering",
+  description:
+    "Order fresh South Indian breakfast online from New Maruthi Tiffins.",
+  images: ["/images/og-image.jpg"],
+},
 
   robots: {
     index: true,
