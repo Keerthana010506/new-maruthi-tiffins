@@ -86,7 +86,7 @@ export default function RootLayout({
   "@context": "https://schema.org",
   "@type": "Restaurant",
   name: "New Maruthi Tiffins",
-  image: "https://new-maruthi-tiffins.vercel.app/favicon.ico",
+  "image": "https://new-maruthi-tiffins.vercel.app/images/og-image.jpg",
   url: "https://new-maruthi-tiffins.vercel.app",
   telephone: "",
   servesCuisine: "South Indian",
