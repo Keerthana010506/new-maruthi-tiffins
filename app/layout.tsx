@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
   keywords: [
     "New Maruthi Tiffins",
     "Maruthi Tiffins",
+    "HanamkondaTiffins",
     "Warangal Tiffins",
     "Breakfast",
     "Online Food Ordering",
@@ -62,12 +64,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const restaurantSchema = {
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  name: "New Maruthi Tiffins",
+  image: "https://new-maruthi-tiffins.vercel.app/favicon.ico",
+  url: "https://new-maruthi-tiffins.vercel.app",
+  telephone: "",
+  servesCuisine: "South Indian",
+  priceRange: "₹",
+  openingHours: "Mo-Su 06:00-14:00",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Hanamkonda",
+    addressRegion: "Telangana",
+    addressCountry: "IN"
+  }
+};
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+   <Script
+  id="restaurant-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(restaurantSchema),
+  }}
+/>
+{children}
+      </body>
     </html>
   );
 }
