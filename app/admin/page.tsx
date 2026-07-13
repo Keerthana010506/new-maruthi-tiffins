@@ -1,5 +1,9 @@
 "use client";
-import { getMenuItems } from "@/src/lib/firestore";
+import {
+  getMenuItems,
+  getRestaurantStatus,
+  updateRestaurantStatus,
+} from "@/src/lib/firestore";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -50,14 +54,18 @@ type MenuItem = {
 };
 export default function AdminPage() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
-  useEffect(() => {
-  async function loadMenu() {
-    const items = await getMenuItems();
+  const [restaurantOpen, setRestaurantOpen] = useState(true);
 
+  useEffect(() => {
+  async function loadData() {
+    const items = await getMenuItems();
     setMenu(items as MenuItem[]);
+
+    const status = await getRestaurantStatus();
+    setRestaurantOpen(status);
   }
 
-  loadMenu();
+  loadData();
 }, []);
   const router = useRouter();
   const [checkingLogin, setCheckingLogin] = useState(true);
@@ -414,6 +422,65 @@ maxWidth: 120,
   selectedStatus={selectedStatus}
   setSelectedStatus={setSelectedStatus}
 />
+  <div
+  style={{
+    marginTop: 20,
+    background: "#ffffff",
+    borderRadius: 16,
+    padding: 20,
+    boxShadow: "0 8px 20px rgba(0,0,0,.08)",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 15,
+  }}
+>
+  <div>
+    <h3
+      style={{
+        margin: 0,
+        color: "#2d2d2d",
+      }}
+    >
+      Restaurant Status
+    </h3>
+
+    <p
+      style={{
+        margin: "8px 0 0",
+        fontSize: 16,
+        color: restaurantOpen ? "#16a34a" : "#dc2626",
+        fontWeight: "bold",
+      }}
+    >
+      {restaurantOpen ? "🟢 OPEN" : "🔴 CLOSED"}
+    </p>
+  </div>
+
+  <button
+    onClick={async () => {
+      const newStatus = !restaurantOpen;
+
+      await updateRestaurantStatus(newStatus);
+
+      setRestaurantOpen(newStatus);
+    }}
+    style={{
+      background: restaurantOpen ? "#dc2626" : "#16a34a",
+      color: "white",
+      border: "none",
+      padding: "12px 22px",
+      borderRadius: 10,
+      cursor: "pointer",
+      fontWeight: "bold",
+      fontSize: 15,
+    }}
+  >
+    {restaurantOpen ? "Close Restaurant" : "Open Restaurant"}
+  </button>
+</div>
+
 </div>
 <div
   style={{

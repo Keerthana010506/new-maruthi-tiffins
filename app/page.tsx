@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { createOrder } from "@/src/lib/firestore";
+import {
+  createOrder,
+  subscribeRestaurantStatus,
+} from "@/src/lib/firestore";
 import { getDeviceToken } from "@/src/lib/device";
 import Image from "next/image";
 import BottomNav from "./components/BottomNav";
@@ -31,6 +34,7 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cartSectionRef = useRef<HTMLDivElement | null>(null);
   const [showFloatingCart, setShowFloatingCart] = useState(true);
+  const [restaurantOpen, setRestaurantOpen] = useState(true);
 
   useEffect(() => {
   function loadProfile() {
@@ -62,6 +66,14 @@ useEffect(() => {
     }));
 
     setMenu(data);
+  });
+
+  return () => unsubscribe();
+}, []);
+
+  useEffect(() => {
+  const unsubscribe = subscribeRestaurantStatus((status) => {
+    setRestaurantOpen(status);
   });
 
   return () => unsubscribe();
@@ -227,17 +239,115 @@ setTimeout(() => {
   }
 
   return (
- <main
+<>
+  {!restaurantOpen ? (
+
+    <main
   style={{
-    background: "#ece6dc",
     minHeight: "100vh",
-    width: "100%",
-    padding: "10px",
-    paddingBottom: "120px",
-    boxSizing: "border-box",
-    color: "#111",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundImage: "url('/images/logo.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    position: "relative",
   }}
 >
+  {/* Dark overlay */}
+
+  <div
+    style={{
+      position: "absolute",
+      inset: 0,
+      background: "rgba(0,0,0,0.55)",
+    }}
+  />
+
+  {/* Card */}
+
+  <div
+    style={{
+      position: "relative",
+      zIndex: 1,
+      maxWidth: 500,
+      width: "100%",
+      background: "rgba(255,255,255,0.95)",
+      borderRadius: 24,
+      padding: 40,
+      textAlign: "center",
+      boxShadow: "0 12px 35px rgba(0,0,0,.3)",
+    }}
+  >
+    <Image
+      src="/images/logo.png"
+      alt="New Maruthi Tiffins"
+      width={90}
+      height={90}
+      style={{
+        marginBottom: 20,
+        borderRadius: 16,
+      }}
+    />
+
+    <h1
+      style={{
+        color: "#b91c1c",
+        marginBottom: 10,
+      }}
+    >
+      New Maruthi Tiffins
+    </h1>
+
+    <h2
+      style={{
+        color: "#dc2626",
+        marginBottom: 20,
+      }}
+    >
+      Sorry! We are currently closed.
+    </h2>
+
+    <p
+      style={{
+        fontSize: 18,
+        lineHeight: 1.8,
+        color: "#333",
+      }}
+    >
+      We are open every day
+      <br />
+      <strong>6:00 AM – 2:00 PM</strong>
+    </p>
+
+    <p
+      style={{
+        marginTop: 25,
+        color: "#666",
+      }}
+    >
+      ❤️ Thank you for visiting.
+      <br />
+      We look forward to serving you soon!
+    </p>
+  </div>
+</main>
+
+  ) : (
+
+    <main
+      style={{
+        background: "#ece6dc",
+        minHeight: "100vh",
+        width: "100%",
+        padding: "10px",
+        paddingBottom: "120px",
+        boxSizing: "border-box",
+        color: "#111",
+      }}
+    >
+
       <div
   style={{
   display: "flex",
@@ -458,6 +568,7 @@ setTimeout(() => {
     );
   }
 
+  
   // Item available AND already in cart
   return (
     <div
@@ -952,13 +1063,17 @@ setTimeout(() => {
     </div>
   </div>
 )}
-      <BottomNav />
-      
+           <BottomNav />
+
       <audio
-  ref={audioRef}
-  src="/sounds/success.mp3"
-/>
+        ref={audioRef}
+        src="/sounds/success.mp3"
+      />
 
     </main>
-  );
+
+  )}
+
+</>
+);
 }

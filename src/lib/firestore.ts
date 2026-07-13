@@ -1,4 +1,3 @@
-
 import {
   collection,
   addDoc,
@@ -7,7 +6,11 @@ import {
   updateDoc,
   deleteDoc,
   doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
 } from "firebase/firestore";
+
 
 import { db } from "./firebase";
 export async function createOrder(order: Record<string, unknown>) {
@@ -71,7 +74,8 @@ export async function deleteMenuItem(
 export async function toggleAvailability(
   firestoreId: string,
   available: boolean
-) {
+)
+ {
   await updateDoc(
     doc(db, "menu", firestoreId),
     {
@@ -80,4 +84,46 @@ export async function toggleAvailability(
   );
 
 
+}
+// Restaurant Status
+
+export async function getRestaurantStatus() {
+  const docRef = doc(db, "settings", "restaurant");
+
+  const snapshot = await getDoc(docRef);
+
+  if (!snapshot.exists()) {
+    await setDoc(docRef, {
+      isOpen: true,
+    });
+
+    return true;
+  }
+
+  return snapshot.data().isOpen;
+}
+
+export async function updateRestaurantStatus(
+  isOpen: boolean
+) {
+  const docRef = doc(db, "settings", "restaurant");
+
+  await setDoc(
+    docRef,
+    {
+      isOpen,
+    },
+    { merge: true }
+  );
+}
+export function subscribeRestaurantStatus(
+  callback: (isOpen: boolean) => void
+) {
+  const docRef = doc(db, "settings", "restaurant");
+
+  return onSnapshot(docRef, (snapshot) => {
+    if (snapshot.exists()) {
+      callback(snapshot.data().isOpen);
+    }
+  });
 }
