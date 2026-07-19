@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +23,8 @@ export const metadata: Metadata = {
     "Official website of New Maruthi Tiffins. Browse today's menu, place orders online and enjoy fresh homemade tiffins.",
 
   keywords: [
+    "new maruthi tiffins",
+    "new maruthi",
     "New Maruthi Tiffins",
     "Maruthi Tiffins",
     "HanamkondaTiffins",
@@ -113,6 +116,31 @@ export default function RootLayout({
     __html: JSON.stringify(restaurantSchema),
   }}
 />
+
+<Toaster
+  position="top-center"
+  toastOptions={{
+    duration: 2500,
+    style: {
+      borderRadius: "12px",
+      background: "#333",
+      color: "#fff",
+      fontSize: "15px",
+      fontWeight: "600",
+    },
+    success: {
+      style: {
+        background: "#16a34a",
+      },
+    },
+    error: {
+      style: {
+        background: "#dc2626",
+      },
+    },
+  }}
+/>
+
 {children}
       </body>
     </html>

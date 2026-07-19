@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import toast from "react-hot-toast";
 import {
   createOrder,
   subscribeRestaurantStatus,
@@ -35,25 +36,23 @@ export default function Home() {
   const cartSectionRef = useRef<HTMLDivElement | null>(null);
   const [showFloatingCart, setShowFloatingCart] = useState(true);
   const [restaurantOpen, setRestaurantOpen] = useState(true);
+  const [distance, setDistance] = useState(0);
+  const [locationLoading, setLocationLoading] = useState(false);
 
-  useEffect(() => {
-  function loadProfile() {
-    const profile = JSON.parse(
-      localStorage.getItem("customerProfile") || "{}"
-    );
+const [location, setLocation] = useState<{
+  latitude: number;
+  longitude: number;
+  mapsLink: string;
+} | null>(null);
 
-    setCustomerName(profile.name || "");
-    setPhone(profile.phone || "");
-    setAddress(profile.address || "");
-  }
+ useEffect(() => {
+  const profile = JSON.parse(
+    localStorage.getItem("customerProfile") || "{}"
+  );
 
-  loadProfile();
-
-  window.addEventListener("focus", loadProfile);
-
-  return () => {
-    window.removeEventListener("focus", loadProfile);
-  };
+  setCustomerName(profile.name || "");
+  setPhone(profile.phone || "");
+  setAddress(profile.address || "");
 }, []);
 
 useEffect(() => {
@@ -95,6 +94,33 @@ useEffect(() => {
 
   return () => window.removeEventListener("scroll", handleScroll);
 }, []);
+
+
+  const RESTAURANT_LAT = 18.000244;
+const RESTAURANT_LNG = 79.550626;
+
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+) {
+  const R = 6371;
+
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
 
   function addToCart(name: string, price: number) {
     const exists = cart.find((i) => i.name === name);
@@ -160,29 +186,30 @@ useEffect(() => {
     ? 0
     : subtotal >= 300
     ? 0
-    : deliveryZone === "0-3"
+    : distance <= 3
     ? 30
-    : deliveryZone === "3-6"
+    : distance <= 6
     ? 40
     : 60;
 
   const total = subtotal + deliveryFee;
   
   async function placeOrder() {
-    if (phone.length !== 10) {
-  alert("Please enter a valid 10-digit mobile number.");
+  if (phone.length !== 10) {
+  toast.error("Please enter a valid 10-digit mobile number.");
   return;
 }
     
-    if (
-      !customerName ||
-      !phone ||
-      !address ||
-      cart.length === 0
-    ) {
-      alert("Fill all details");
-      return;
-    }
+   if (
+  !customerName ||
+  !phone ||
+  !address ||
+  !location ||
+  cart.length === 0
+) {
+  toast.error("Please fill all details.");
+  return;
+}
 
     const order = {
   id: Date.now(),
@@ -191,6 +218,10 @@ useEffect(() => {
   customerName,
   phone,
   address,
+   
+  latitude: location?.latitude || null,
+  longitude: location?.longitude || null,
+  mapsLink: location?.mapsLink || "",
   customerId: phone,
   cart,
   subtotal,
@@ -208,7 +239,7 @@ useEffect(() => {
   orderDate: new Date().toLocaleDateString(),
 };
 await createOrder(order);
-
+toast.success("Order placed successfully!");
 
 localStorage.setItem("customerPhone", phone);
     setShowSuccess(true);
@@ -224,6 +255,79 @@ setTimeout(() => {
     setPhone("");
     setAddress("");
   }
+
+async function getCurrentLocation() {
+  if (!navigator.geolocation) {
+    alert("Your browser doesn't support location.");
+    return;
+  }
+
+  setLocationLoading(true);
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      const mapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+// Calculate distance
+const km = calculateDistance(
+  RESTAURANT_LAT,
+  RESTAURANT_LNG,
+  latitude,
+  longitude
+);
+
+setDistance(Number(km.toFixed(2)));
+
+// Auto delivery zone
+if (km <= 3) {
+  setDeliveryZone("0-3");
+} else if (km <= 6) {
+  setDeliveryZone("3-6");
+} else {
+  setDeliveryZone("6-8");
+}
+
+// Get readable address
+let fullAddress = "";
+
+try {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+  );
+
+  const data = await response.json();
+
+  fullAddress = data.display_name || "";
+
+  setAddress(fullAddress);
+} catch (error) {
+  console.error(error);
+}
+
+setLocation({
+  latitude,
+  longitude,
+  mapsLink,
+});
+
+setLocationLoading(false);
+
+alert(
+  `Location captured!\nDistance: ${km.toFixed(2)} km`
+);
+    },
+    () => {
+      setLocationLoading(false);
+
+      alert(
+        "Unable to get your location. Please allow location permission."
+      );
+    }
+  );
+}
 
   function statusColor() {
     if (orderStatus === "Accepted")
@@ -750,91 +854,22 @@ setTimeout(() => {
     </div>
   </div>
 ))}
-        <h3
+
+    <input
   style={{
-    marginTop: 20,
-    color: "#c40000",
+    width: "100%",
+    padding: "12px",
+    borderRadius: 10,
+    border: "1px solid #ddd",
+    fontSize: 15,
+    marginBottom: 14,
+    boxSizing: "border-box",
   }}
->
-  🚚 Select Delivery Distance
-</h3>
+  value={customerName}
+  onChange={(e) => setCustomerName(e.target.value)}
+  placeholder="Your Name"
+/>
 
-<label
-  style={{
-    display: "block",
-    marginBottom: 8,
-    fontSize: 16,
-  }}
->
-
-  <input
-    type="radio"
-    value="0-3"
-    checked={deliveryZone === "0-3"}
-    onChange={(e) =>
-      setDeliveryZone(e.target.value)
-    }
-  />
-  {" "}0–3 km (₹30)
-</label>
-
-
-<label
-  style={{
-    display: "block",
-    marginBottom: 8,
-    fontSize: 16,
-    color: "#333",
-  }}
->
-
-  <input
-    type="radio"
-    value="3-6"
-    checked={deliveryZone === "3-6"}
-    onChange={(e) =>
-      setDeliveryZone(e.target.value)
-    }
-  />
-  {" "}3–6 km (₹40)
-</label>
-
-<label
-  style={{
-    display: "block",
-    marginBottom: 8,
-    fontSize: 16,
-    color: "#333",
-  }}
->
-  <input
-    type="radio"
-    value="6-8"
-    checked={deliveryZone === "6-8"}
-    onChange={(e) =>
-      setDeliveryZone(e.target.value)
-    }
-  />
-  {" "}6–8 km (₹60)
-</label>
-        <input
-        style={{
-  width: "100%",
-  padding: "12px",
-  borderRadius: 10,
-  border: "1px solid #ddd",
-  fontSize: 15,
-  marginBottom: 14,
-  boxSizing: "border-box",
-}}
-          value={customerName}
-          onChange={(e) =>
-            setCustomerName(
-              e.target.value
-            )
-          }
-          placeholder="Your Name"
-        />
         <input
   style={{
     width: "100%",
@@ -888,6 +923,29 @@ setTimeout(() => {
           }
           placeholder="Address"
         />
+
+        <button
+  type="button"
+  onClick={getCurrentLocation}
+  style={{
+    width: "100%",
+    padding: "12px",
+    marginBottom: 14,
+    background: "#2563eb",
+    color: "white",
+    border: "none",
+    borderRadius: 10,
+    cursor: "pointer",
+    fontWeight: "bold",
+    fontSize: 15,
+  }}
+>
+  {locationLoading
+    ? "Getting Location..."
+    : location
+    ? "✅ Location Captured"
+    : "📍 Use Current Location"}
+</button>
 
       <div
   style={{
@@ -953,6 +1011,7 @@ setTimeout(() => {
   phone.length !== 10 ||
   !customerName ||
   !address ||
+  !location ||
   cart.length === 0
 }
           onClick={placeOrder}
@@ -961,6 +1020,7 @@ setTimeout(() => {
     phone.length !== 10 ||
     !customerName ||
     !address ||
+    !location ||
     cart.length === 0
       ? "#9ca3af"
       : "#c40000",
@@ -976,6 +1036,7 @@ setTimeout(() => {
     phone.length !== 10 ||
     !customerName ||
     !address ||
+    !location ||
     cart.length === 0
       ? "not-allowed"
       : "pointer",
@@ -984,6 +1045,7 @@ setTimeout(() => {
     phone.length !== 10 ||
     !customerName ||
     !address ||
+    !location ||
     cart.length === 0
       ? 0.7
       : 1,

@@ -371,10 +371,12 @@ maxWidth: 120,
 </div>
 {pendingOrders.length > 0 && (
   <div
+    onClick={() => setSelectedStatus("Pending")}
     style={{
       background: "#dc2626",
       color: "white",
       padding: "16px",
+      cursor: "pointer",
       borderRadius: 16,
       textAlign: "center",
       fontWeight: "bold",
@@ -385,9 +387,25 @@ maxWidth: 120,
   >
     🔔 NEW ORDER RECEIVED!
     <br />
-    <span style={{ fontSize: 16 }}>
-      Waiting for acceptance...
-    </span>
+   <span
+  style={{
+    fontSize: 16,
+    display: "block",
+    marginTop: 6,
+  }}
+>
+  Waiting for acceptance...
+</span>
+
+<span
+  style={{
+    fontSize: 13,
+    opacity: 0.9,
+  }}
+>
+  Tap here to view pending orders
+</span>
+
   </div>
 )}
 
@@ -413,50 +431,19 @@ maxWidth: 120,
     marginBottom: 25,
   }}
 >
-  <DashboardCards
-  pending={pendingOrders.length}
-  accepted={acceptedOrders.length}
-  preparing={preparedOrders.length}
-  delivered={deliveredOrders.length}
-  revenue={totalRevenue}
-  selectedStatus={selectedStatus}
-  setSelectedStatus={setSelectedStatus}
-/>
-  <div
+    {/* ===== Top Controls ===== */}
+
+<div
   style={{
-    marginTop: 20,
-    background: "#ffffff",
-    borderRadius: 16,
-    padding: 20,
-    boxShadow: "0 8px 20px rgba(0,0,0,.08)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     flexWrap: "wrap",
-    gap: 15,
+    gap: 12,
+    marginBottom: 20,
   }}
 >
-  <div>
-    <h3
-      style={{
-        margin: 0,
-        color: "#2d2d2d",
-      }}
-    >
-      Restaurant Status
-    </h3>
-
-    <p
-      style={{
-        margin: "8px 0 0",
-        fontSize: 16,
-        color: restaurantOpen ? "#16a34a" : "#dc2626",
-        fontWeight: "bold",
-      }}
-    >
-      {restaurantOpen ? "🟢 OPEN" : "🔴 CLOSED"}
-    </p>
-  </div>
+  {/* Restaurant Status */}
 
   <button
     onClick={async () => {
@@ -467,53 +454,146 @@ maxWidth: 120,
       setRestaurantOpen(newStatus);
     }}
     style={{
-      background: restaurantOpen ? "#dc2626" : "#16a34a",
+      background: restaurantOpen ? "#16a34a" : "#dc2626",
       color: "white",
       border: "none",
-      padding: "12px 22px",
-      borderRadius: 10,
-      cursor: "pointer",
+      padding: "10px 18px",
+      borderRadius: 12,
       fontWeight: "bold",
+      cursor: "pointer",
       fontSize: 15,
     }}
   >
-    {restaurantOpen ? "Close Restaurant" : "Open Restaurant"}
+    {restaurantOpen
+      ? "🟢 Restaurant Open"
+      : "🔴 Restaurant Closed"}
   </button>
-</div>
 
-</div>
-<div
-  style={{
-    marginTop: 30,
-    marginBottom: 30,
-  }}
->
-</div>
+  {/* Manage Menu */}
 
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    margin: "20px 0 30px",
-  }}
->
   <button
     onClick={() => router.push("/admin/menu")}
     style={{
       background: "#b91c1c",
       color: "white",
       border: "none",
-      padding: "14px 24px",
+      padding: "10px 18px",
       borderRadius: 12,
       cursor: "pointer",
-      fontSize: 16,
       fontWeight: "bold",
-      boxShadow: "0 4px 10px rgba(0,0,0,.15)",
+      fontSize: 15,
     }}
   >
     🍽 Manage Menu
   </button>
+
+  {/* Revenue */}
+
+  <div
+  onClick={() => setSelectedStatus("Revenue")}
+  style={{
+    background: "#fff",
+    padding: "10px 18px",
+    borderRadius: 12,
+    cursor: "pointer",
+    boxShadow: "0 3px 10px rgba(0,0,0,.08)",
+    textAlign: "center",
+    minWidth: 90,
+  }}
+>
+  <div
+    style={{
+      fontSize: 12,
+      color: "#666",
+      fontWeight: 600,
+    }}
+  >
+    💰 Today
+  </div>
+
+  <div
+    style={{
+      fontSize: 20,
+      fontWeight: "bold",
+      color: "#111",
+    }}
+  >
+    ₹{todayRevenue}
+  </div>
 </div>
+
+</div>
+
+{/* ===== Order Tabs ===== */}
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 8,
+    marginBottom: 20,
+  }}
+>
+</div>
+
+  {[
+    {
+      label: "Accepted",
+      value: "Accepted",
+    },
+    {
+      label: "Ready",
+      value: "Prepared",
+    },
+    {
+      label: "Delivered",
+      value: "Delivered",
+    },
+
+    
+
+  ].map((tab) => (
+    <button
+      key={tab.value}
+      onClick={() => setSelectedStatus(tab.value)}
+      style={{
+        flex: 1,
+        minWidth: 0,
+        padding: "10px 6px",
+        fontSize: 13,
+        borderRadius: 12,
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "bold",
+        background:
+          selectedStatus === tab.value
+            ? "#b91c1c"
+            : "#ffffff",
+        color:
+          selectedStatus === tab.value
+            ? "white"
+            : "#333",
+        boxShadow: "0 3px 10px rgba(0,0,0,.08)",
+      }}
+    >
+      {tab.label}
+    </button>
+  ))}
+</div>
+
+{/* ===== Pending Orders ===== */}
+
+{selectedStatus === "Pending" && (
+  <h2
+    style={{
+      marginBottom: 18,
+      color: "#dc2626",
+      fontSize: 24,
+    }}
+  >
+    🔔 Pending Orders
+  </h2>
+)}
 
     {selectedStatus === "Revenue" ? (
 

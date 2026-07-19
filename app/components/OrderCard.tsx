@@ -10,6 +10,7 @@ type Order = {
   customerName: string;
   phone: string;
   address: string;
+  mapsLink?: string;
   cart: CartItem[];
   subtotal: number;
   deliveryFee: number;
@@ -38,17 +39,17 @@ export default function OrderCard({
 }: Props) {
   const buttons = [
     {
-      label: "✅ Accept",
+      label: "Accept",
       value: "Accepted",
       color: "#16a34a",
     },
     {
-      label: "🍽 Prepared",
+      label: "Ready",
       value: "Prepared",
       color: "#f59e0b",
     },
     {
-      label: "🚚 Delivered",
+      label: "Deliver",
       value: "Delivered",
       color: "#2563eb",
     },
@@ -58,9 +59,9 @@ export default function OrderCard({
   <div
     style={{
       background: "#fff",
-      padding: "clamp(14px,4vw,20px)",
-      borderRadius: 18,
-      marginBottom: 22,
+      padding: "14px",
+      borderRadius: 14,
+      marginBottom: 14,
       boxShadow: "0 8px 20px rgba(0,0,0,.08)",
       border: "1px solid #eee",
     }}
@@ -69,8 +70,8 @@ export default function OrderCard({
       style={{
         color: "#c40000",
         marginTop: 0,
-        marginBottom: 18,
-        fontSize: "clamp(24px,5vw,32px)",
+        marginBottom: 10,
+        fontSize: 22,
         fontWeight: "800",
       }}
     >
@@ -80,8 +81,8 @@ export default function OrderCard({
     {/* Customer Details */}
     <div
       style={{
-        marginBottom: 20,
-        lineHeight: 1.9,
+        marginBottom: 10,
+        lineHeight: 1.45,
         fontSize: "clamp(14px,3vw,16px)",
         color: "#222"
       }}
@@ -89,8 +90,38 @@ export default function OrderCard({
       <div><strong>👤 {order.customerName}</strong></div>
       <div>📞 {order.phone}</div>
       <div>📍 {order.address}</div>
-      <div>📅 {order.orderDate}</div>
-      <div>🕒 {order.orderTime}</div>
+      {order.mapsLink && (
+  <div style={{ marginTop: 10 }}>
+    <a
+      href={order.mapsLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "inline-block",
+        background: "#2563eb",
+        color: "white",
+        padding: "8px 14px",
+        borderRadius: 8,
+        textDecoration: "none",
+        fontWeight: "bold",
+      }}
+    >
+      📍 Open Customer Location
+    </a>
+  </div>
+)}
+      <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    marginTop: 4,
+    fontSize: 14,
+  }}
+>
+  <span>📅 {order.orderDate}</span>
+
+  <span>🕒 {order.orderTime}</span>
+</div>
 
       {order.deliveredTime && (
         <div
@@ -109,7 +140,7 @@ export default function OrderCard({
       style={{
         border: 0,
         borderTop: "1px dashed #ddd",
-        margin: "18px 0",
+        margin: "10px 0",
       }}
     />
 
@@ -117,9 +148,9 @@ export default function OrderCard({
     <h3
   style={{
     marginTop: 0,
-    marginBottom: 14,
+    marginBottom: 8,
     color: "#b91c1c",
-    fontSize: "22px",
+    fontSize: 18,
     fontWeight: "800",
   }}
 >
@@ -132,9 +163,9 @@ export default function OrderCard({
         style={{
           display: "flex",
           justifyContent: "space-between",
-          padding: "8px 0",
+          padding: "5px 0",
           borderBottom: "1px dashed #eee",
-          fontSize: "clamp(14px,3vw,16px)",
+          fontSize: 16,
           color: "#222",
         }}
       >
@@ -150,7 +181,7 @@ export default function OrderCard({
 
         <strong
   style={{
-    fontSize: "18px",
+    fontSize: 16,
     color: "#b91c1c",
   }}
 >
@@ -162,7 +193,7 @@ export default function OrderCard({
 
     <div
       style={{
-        marginTop: 12,
+        marginTop: 8,
         lineHeight: 1.5,
          fontSize: "clamp(14px,2.8vw,16px)",
     color: "#222",
@@ -175,8 +206,8 @@ export default function OrderCard({
       <h2
         style={{
           color: "#c40000",
-          margin: "10px 0",
-          fontSize: "clamp(22px,5vw,30px)",
+          margin: "6px 0",
+          fontSize: 20,
         }}
       >
         Total : ₹{order.total}
@@ -187,7 +218,7 @@ export default function OrderCard({
     style={{
       background: statusColor(order.status),
       color: "#fff",
-      padding: "6px 14px",
+      padding: "5px 12px",
       borderRadius: 999,
       fontWeight: "700",
       fontSize: 14,
@@ -195,8 +226,10 @@ export default function OrderCard({
     }}
   >
     {order.status === "Pending"
-      ? "Order Received"
-      : order.status}
+  ? "Order Received"
+  : order.status === "Prepared"
+  ? "Ready"
+  : order.status}
   </span>
 </div>
 </div>
@@ -204,10 +237,9 @@ export default function OrderCard({
     <div
       style={{
         display: "grid",
-        gridTemplateColumns:
-          "repeat(auto-fit,minmax(140px,1fr))",
+        gridTemplateColumns:"repeat(3,1fr)",
         gap: 8,
-        marginTop: 22,
+        marginTop: 12,
       }}
     >
       {buttons.map((btn) => (
@@ -251,12 +283,12 @@ export default function OrderCard({
 
             borderRadius: 10,
 
-            padding: "8px 6px",
-            minHeight: 38,
+            padding: "10px 4px",
+            minHeight: 42,
 
             fontWeight: "600",
 
-            fontSize: 12,
+            fontSize: 13,
       
 
             cursor:
