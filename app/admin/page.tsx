@@ -288,17 +288,15 @@ if (checkingLogin) {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 15,
-    flexWrap: "wrap",
-    marginBottom: 30,
+    marginBottom: 18,
   }}
 >
-  <div
+ <div
   style={{
     display: "flex",
     alignItems: "center",
-    gap: 16,
-    flexWrap: "wrap",
+    gap: 12,
+    flex: 1,
   }}
 >
    <Image
@@ -319,7 +317,7 @@ if (checkingLogin) {
           fontSize: "clamp(20px,5vw,32px)",
         }}
       >
-        New Maruthi Tiffins
+        New Maruthi
       </h1>
 
       <p
@@ -329,18 +327,17 @@ if (checkingLogin) {
     fontSize: "clamp(13px,3vw,16px)",
   }}
 >
-        Admin Dashboard
+        Admin
       </p>
     </div>
   </div>
 
-  <div
-    style={{
-      display: "flex",
-      gap: 12,
-      flexWrap: "wrap",
-    }}
-  >
+ <div
+style={{
+display:"flex",
+alignItems:"center",
+}}
+>
 
     <button
       onClick={() => {
@@ -355,14 +352,12 @@ if (checkingLogin) {
   background: "#dc2626",
   color: "white",
   border: "none",
-  padding: "10px 18px",
-width: "100%",
-maxWidth: 120,
+  padding: "0 18px",
+  height: 42,
   borderRadius: 10,
   cursor: "pointer",
   fontWeight: "bold",
   fontSize: 15,
-  minWidth: 100,
 }}
     >
       Logout
@@ -432,97 +427,119 @@ maxWidth: 120,
   }}
 >
     {/* ===== Top Controls ===== */}
+    {/* Restaurant + Revenue */}
 
 <div
   style={{
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 20,
+    marginBottom: 12,
   }}
 >
-  {/* Restaurant Status */}
+
+  {/* Restaurant */}
 
   <button
     onClick={async () => {
       const newStatus = !restaurantOpen;
-
       await updateRestaurantStatus(newStatus);
-
       setRestaurantOpen(newStatus);
     }}
-    style={{
-      background: restaurantOpen ? "#16a34a" : "#dc2626",
-      color: "white",
-      border: "none",
-      padding: "10px 18px",
-      borderRadius: 12,
-      fontWeight: "bold",
-      cursor: "pointer",
-      fontSize: 15,
-    }}
+   style={{
+  background: restaurantOpen ? "#16a34a" : "#dc2626",
+  color: "white",
+  border: "none",
+  borderRadius: 12,
+  fontWeight: "bold",
+  cursor: "pointer",
+  fontSize: 15,
+
+  width: 170,
+  height: 70,
+
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+
+  boxShadow: "0 3px 10px rgba(0,0,0,.08)",
+}}
   >
     {restaurantOpen
       ? "🟢 Restaurant Open"
       : "🔴 Restaurant Closed"}
   </button>
 
-  {/* Manage Menu */}
+  {/* Revenue */}
+
+  <div
+    onClick={() => setSelectedStatus("Revenue")}
+   style={{
+  background: "#fff",
+  width: 170,
+  height: 70,
+
+  borderRadius: 12,
+  cursor: "pointer",
+
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+
+  boxShadow: "0 3px 10px rgba(0,0,0,.08)",
+}}
+  >
+    <div
+      style={{
+        fontSize: 12,
+        color: "#666",
+        fontWeight: 600,
+      }}
+    >
+      💰 Today
+    </div>
+
+    <div
+      style={{
+        fontSize: 18,
+        fontWeight: "bold",
+      }}
+    >
+      ₹{todayRevenue}
+    </div>
+
+  </div>
+
+</div>
+
+{/* Manage Menu */}
+
+<div
+  style={{
+    marginBottom: 20,
+  }}
+>
 
   <button
     onClick={() => router.push("/admin/menu")}
     style={{
-      background: "#b91c1c",
-      color: "white",
-      border: "none",
-      padding: "10px 18px",
-      borderRadius: 12,
-      cursor: "pointer",
-      fontWeight: "bold",
-      fontSize: 15,
-    }}
+  background: "#b91c1c",
+  color: "white",
+  border: "none",
+  width: "100%",
+  padding: "12px",
+  borderRadius: 12,
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: 15,
+}}
   >
     🍽 Manage Menu
   </button>
 
-  {/* Revenue */}
-
-  <div
-  onClick={() => setSelectedStatus("Revenue")}
-  style={{
-    background: "#fff",
-    padding: "10px 18px",
-    borderRadius: 12,
-    cursor: "pointer",
-    boxShadow: "0 3px 10px rgba(0,0,0,.08)",
-    textAlign: "center",
-    minWidth: 90,
-  }}
->
-  <div
-    style={{
-      fontSize: 12,
-      color: "#666",
-      fontWeight: 600,
-    }}
-  >
-    💰 Today
-  </div>
-
-  <div
-    style={{
-      fontSize: 20,
-      fontWeight: "bold",
-      color: "#111",
-    }}
-  >
-    ₹{todayRevenue}
-  </div>
 </div>
 
-</div>
 
 {/* ===== Order Tabs ===== */}
 
@@ -530,23 +547,22 @@ maxWidth: 120,
   style={{
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 8,
+    gap: 10,
     marginBottom: 20,
   }}
 >
-</div>
 
   {[
     {
-      label: "Accepted",
+      label: `Accepted (${acceptedOrders.length})`,
       value: "Accepted",
     },
     {
-      label: "Ready",
+      label: `Ready (${preparedOrders.length})`,
       value: "Prepared",
     },
     {
-      label: "Delivered",
+      label: `Delivered (${deliveredOrders.length})`,
       value: "Delivered",
     },
 
@@ -557,14 +573,14 @@ maxWidth: 120,
       key={tab.value}
       onClick={() => setSelectedStatus(tab.value)}
       style={{
-        flex: 1,
+        width:"100%",
         minWidth: 0,
-        padding: "10px 6px",
-        fontSize: 13,
+        padding: "12px 0",
+        fontSize: 15,
         borderRadius: 12,
         border: "none",
         cursor: "pointer",
-        fontWeight: "bold",
+        fontWeight: 700,
         background:
           selectedStatus === tab.value
             ? "#b91c1c"
@@ -579,6 +595,7 @@ maxWidth: 120,
       {tab.label}
     </button>
   ))}
+</div>
 </div>
 
 {/* ===== Pending Orders ===== */}
