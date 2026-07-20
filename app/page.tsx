@@ -254,13 +254,16 @@ setTimeout(() => {
     setCustomerName("");
     setPhone("");
     setAddress("");
+    setLocation(null);
+    setDistance(0);
+    setDeliveryZone("0-3");
   }
 
 async function getCurrentLocation() {
   if (!navigator.geolocation) {
-    alert("Your browser doesn't support location.");
-    return;
-  }
+  toast.error("Your browser doesn't support location.");
+  return;
+}
 
   setLocationLoading(true);
 
@@ -315,14 +318,12 @@ setLocation({
 
 setLocationLoading(false);
 
-alert(
-  `Location captured!\nDistance: ${km.toFixed(2)} km`
-);
+toast.success(`Location captured! (${km.toFixed(2)} km away)`);
     },
     () => {
       setLocationLoading(false);
 
-      alert(
+      toast.error(
         "Unable to get your location. Please allow location permission."
       );
     }
@@ -470,9 +471,9 @@ alert(
   width={45}
   height={45}
   style={{
-    width: "45px",
-    height: "45px",
-  }}
+  width: "auto",
+  height: 45,
+}}
 />
 
   <div>

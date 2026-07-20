@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
+import { registerServiceWorker } from "@/src/lib/register-sw";
+import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,9 +20,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "New Maruthi Tiffins | Fresh Tiffins & Online Ordering",
-
   description:
     "Official website of New Maruthi Tiffins. Browse today's menu, place orders online and enjoy fresh homemade tiffins.",
+
+
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+  capable: true,
+  statusBarStyle: "default",
+  title: "New Maruthi Tiffins",
+},
+icons: {
+  icon: [
+    { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+  ],
+  apple: "/icons/apple-touch-icon.png",
+},
+
+  metadataBase: new URL("https://new-maruthi-tiffins.vercel.app"),
 
   keywords: [
     "new maruthi tiffins",
@@ -109,6 +127,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+          <ServiceWorkerRegister />
    <Script
   id="restaurant-schema"
   type="application/ld+json"
@@ -140,6 +159,7 @@ export default function RootLayout({
     },
   }}
 />
+
 
 {children}
       </body>
