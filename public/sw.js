@@ -1,10 +1,11 @@
-const CACHE_NAME = "new-maruthi-tiffins-v1";
+const CACHE_NAME = "new-maruthi-tiffins-v2";
 
 const urlsToCache = [
   "/",
   "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
+  "/icons/customer/icon-192.png",
+  "/icons/customer/icon-512.png",
+  "/icons/customer/apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {

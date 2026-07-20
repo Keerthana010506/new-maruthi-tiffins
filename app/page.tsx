@@ -354,7 +354,7 @@ toast.success(`Location captured! (${km.toFixed(2)} km away)`);
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundImage: "url('/images/logo.png')",
+    backgroundImage: "url('/icons/customer/icon-512.png')",
     backgroundSize: "cover",
     backgroundPosition: "center",
     position: "relative",
@@ -386,7 +386,7 @@ toast.success(`Location captured! (${km.toFixed(2)} km away)`);
     }}
   >
     <Image
-      src="/images/logo.png"
+      src="/icons/customer/icon-512.png"
       alt="New Maruthi Tiffins"
       width={90}
       height={90}
@@ -466,7 +466,7 @@ toast.success(`Location captured! (${km.toFixed(2)} km away)`);
 >
 
   <Image
-  src="/images/logo.png"
+  src="/icons/customer/icon-512.png"
   alt="New Maruthi Tiffins"
   width={45}
   height={45}

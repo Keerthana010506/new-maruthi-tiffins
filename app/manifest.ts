@@ -22,17 +22,17 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "en",
 icons: [
   {
-    src: "/icons/icon-192.png",
+    src: "/icons/customer/icon-192.png",
     sizes: "192x192",
     type: "image/png",
   },
   {
-    src: "/icons/icon-512.png",
+    src: "/icons/customer/icon-512.png",
     sizes: "512x512",
     type: "image/png",
   },
   {
-    src: "/icons/apple-touch-icon.png",
+    src: "/icons/customer/apple-touch-icon.png",
     sizes: "180x180",
     type: "image/png",
   },

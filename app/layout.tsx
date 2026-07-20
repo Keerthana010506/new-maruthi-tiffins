@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
-import { registerServiceWorker } from "@/src/lib/register-sw";
 import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
 
 const geistSans = Geist({
@@ -30,14 +29,6 @@ export const metadata: Metadata = {
   statusBarStyle: "default",
   title: "New Maruthi Tiffins",
 },
-icons: {
-  icon: [
-    { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-    { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-  ],
-  apple: "/icons/apple-touch-icon.png",
-},
-
   metadataBase: new URL("https://new-maruthi-tiffins.vercel.app"),
 
   keywords: [

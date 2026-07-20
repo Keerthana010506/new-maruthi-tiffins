@@ -300,7 +300,7 @@ if (checkingLogin) {
   }}
 >
    <Image
-  src="/images/logo.png"
+  src="/icons/customer/icon-512.png"
   alt="New Maruthi Tiffins"
   width={55}
   height={55}
